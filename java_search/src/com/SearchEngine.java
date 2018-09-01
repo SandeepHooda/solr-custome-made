@@ -10,16 +10,26 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import datastructure.File;
 import datastructure.Folder;
 public class SearchEngine {
 
-	private static List<Set<String>> synonymsList = new ArrayList<>();;
-	public static List<Set<String>> getSynonyms() throws IOException {
+	private static List<Set<String>> synonymsList = new ArrayList<>();
+	private static List<File> allFiles = null;
 	
+	
+	/**
+	 * This function creates a list having set of synonym words it reads synonyms.properties
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<Set<String>> getSynonyms() throws IOException {
+		InputStream input  = null;
+	try {
 		String filename = "synonyms.properties";
-		InputStream input  = SearchEngine.class.getClassLoader().getResourceAsStream(filename);
+		input  = SearchEngine.class.getClassLoader().getResourceAsStream(filename);
 		if(input==null){
 	            System.out.println("Sorry, unable to find " + filename);
 		    return null;
@@ -38,78 +48,72 @@ public class SearchEngine {
 		}
 		
 		return synonymsList;
+		
+	}finally {
+		if (input != null) {
+			try {
+				input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-	public static void main(String[] args) {
-
+		
+	}
+	
+	private static List<File> readAllFilesFromConfig() throws IOException{
 		Properties prop = new Properties();
 		InputStream input = null;
-
+		Gson gson = new Gson();
+		List<File> allFiles = new ArrayList<>();
 		try {
-			getSynonyms();
+			//1. Read the config file where folder hierarchical and file information is stored
 			String filename = "config.properties";
-    		input = SearchEngine.class.getClassLoader().getResourceAsStream(filename);
-    		if(input==null){
-    	            System.out.println("Sorry, unable to find " + filename);
-    		    return;
-    		}
-    		
-    		Folder root = new Folder("root");
-    	
-    		
-    		Gson gson = new Gson();
-    	
+			input = SearchEngine.class.getClassLoader().getResourceAsStream(filename);
+			if(input==null){
+		            System.out.println("Sorry, unable to find " + filename);
+			    return null;
+			}
 			prop.load(input);
 			
+			//2. Root contains only folder - Folder in root are at Level 1 in the menu
+			Folder root = new Folder("root");
+		
+
+			//each line item in the property file contains a file attributes like its name , its id , its key word and which folder/ sub folder it exists
 			Set<Object> keys = prop.keySet();
-			
 			for (Object key: keys) {
 				
-				String fileName = (String)key;
-				String[] foldersAndKeyWords = prop.getProperty(fileName).split("\\$@");
-				String[] folders = foldersAndKeyWords[0].split("~");
+				String lineNo = (String)key;
 				
-				Folder topFolder = root.getFolderByName(folders[0]);
-					if (null == topFolder) {
-						topFolder = new Folder(folders[0]);
-						root.getFolders().add(topFolder);
-					}
-					Folder nodeFolder = topFolder;
-					for (int i=1;i<folders.length;i++) {//find out where to place this file
-						Folder subFolder = nodeFolder.getFolderByName(folders[i]);
-						if (null != subFolder) {
-							nodeFolder = subFolder;
-						}else {
-							subFolder = new Folder(folders[i]);
-							nodeFolder.getFolders().add(subFolder);
-							nodeFolder = subFolder;
+				//File attributes like  its name , its id , its key word and folder
+				String fileDetailJson = prop.getProperty(lineNo);
+				File aFile = gson.fromJson(fileDetailJson,File.class);
+				aFile.setRowNum(lineNo);
+				
+				 
+				//Add Synonyms
+				Set<String> filekeyWords = aFile.getKeyWords();
+				Set<String> filekeyWordsWithSynonyms = new HashSet<>();
+				filekeyWordsWithSynonyms.addAll(filekeyWords);
+				Iterator<String> fileKeyWordItr = filekeyWords.iterator();
+				while(fileKeyWordItr.hasNext()) {
+					String keyWord = fileKeyWordItr.next();
+					for (Set<String> synonyms: synonymsList) {
+						if (synonyms.contains(keyWord)) {
+							filekeyWordsWithSynonyms.addAll(synonyms);
 						}
 					}
-					
-					File file = new File(fileName);//This is my custom file not java file utility
-					String[] keyWords = foldersAndKeyWords[1].split(" ");
-					file.getKeyWords().addAll(new HashSet<>(Arrays.asList(keyWords)));
-					Set<String> filekeyWords = file.getKeyWords();
-					Set<String> filekeyWordsWithSynonyms = new HashSet<>();
-					filekeyWordsWithSynonyms.addAll(filekeyWords);
-					Iterator<String> fileKeyWordItr = filekeyWords.iterator();
-					while(fileKeyWordItr.hasNext()) {
-						String keyWord = fileKeyWordItr.next();
-						for (Set<String> synonyms: synonymsList) {
-							if (synonyms.contains(keyWord)) {
-								filekeyWordsWithSynonyms.addAll(synonyms);
-							}
-						}
-					}
-					file.setKeyWords(filekeyWordsWithSynonyms);
-					nodeFolder.getFiles().add(file);
+				}
+				aFile.setKeyWords(filekeyWordsWithSynonyms);
+				
+				allFiles.add(aFile);
 				
 			}
 			
-			System.out.println(gson.toJson(root));
 			
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
+			return allFiles;
+		}finally {
 			if (input != null) {
 				try {
 					input.close();
@@ -118,6 +122,80 @@ public class SearchEngine {
 				}
 			}
 		}
-
+	}
+	
+	/**
+	 * This function create a hierarchical menu. Think of windows folder. Folder can contain another folder(s) or files(s). 
+	 * File here is the actual document that user wants to read. Is is associated with keywords that will make the document search-able
+	 * @return
+	 * @throws IOException
+	 */
+	public static Folder getRootFolderpopulated(List<File> filesList) throws IOException {
+			//1. Root contains only folder - Folder in root are at Level 1 in the menu
+			Folder root = new Folder("root");
+		
+			//each line item in the property file contains a file attributes like its name , its id , its key word and which folder/ sub folder it exists
+			for (File aFile: filesList) {
+				
+				//Place the file in expected folder
+				Folder topFolder = root.getFolderByName(aFile.getFolder().get(0));//The L1 folder where this file will be stored
+					if (null == topFolder) {
+						topFolder = new Folder(aFile.getFolder().get(0));
+						root.getFolders().add(topFolder);
+					}
+					Folder nodeFolder = topFolder;
+					for (int i=1;i<aFile.getFolder().size();i++) {//find out where to place this file
+						Folder subFolder = nodeFolder.getFolderByName(aFile.getFolder().get(i));
+						if (null != subFolder) {
+							nodeFolder = subFolder;
+						}else {
+							subFolder = new Folder(aFile.getFolder().get(i));
+							nodeFolder.getFolders().add(subFolder);
+							nodeFolder = subFolder;
+						}
+					}
+					
+					nodeFolder.getFiles().add(aFile);
+				
+			}
+			
+			
+			return root;
+		
+	
+	}
+	public static void init() throws IOException {
+		getSynonyms();
+		allFiles = 	readAllFilesFromConfig();
+		Folder root = getRootFolderpopulated(allFiles);	
+		
+		/*GsonBuilder builder = new GsonBuilder();  
+		builder.excludeFieldsWithoutExposeAnnotation();  
+		Gson gson = builder.create();  ;
+		
+		System.out.println( gson.toJson(root));*/
+	}
+	public static String getMainMenu(Folder root) throws IOException {
+		
+		GsonBuilder builder = new GsonBuilder();  
+		builder.excludeFieldsWithoutExposeAnnotation();  
+		Gson gson = builder.create();  ;
+		
+		return gson.toJson(root);
+	}
+	public static void main(String[] args) throws IOException {
+		init();
+		
 	  }
+
+	public static List<File> getAllFiles() throws IOException {
+		if (null == allFiles) {
+			init();
+		}
+		return allFiles;
+	}
+
+	public static void setAllFiles(List<File> allFiles) {
+		SearchEngine.allFiles = allFiles;
+	}
 }

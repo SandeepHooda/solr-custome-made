@@ -1,14 +1,27 @@
 package datastructure;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class File {
-	private String name;
-	private Set<String> keyWords = new HashSet<>();
+import com.google.gson.annotations.Expose;
 
-	public File(String name) {
+public class File {
+	@Expose(serialize = false, deserialize = false)
+	private String rowNum;
+	@Expose()
+	private String name;
+	@Expose()
+	private String id;
+	@Expose(serialize = false, deserialize = true)
+	private Set<String> keyWords = new HashSet<>();
+	@Expose(serialize = false, deserialize = true)
+	private List<String> folder = new ArrayList<>();
+
+	public File(String name, String id) {
 		this.name = name;
+		this.id = id;
 	}
 	public String getName() {
 		return name;
@@ -23,7 +36,29 @@ public class File {
 	}
 
 	public void setKeyWords(Set<String> keyWords) {
-		this.keyWords = keyWords;
+		this.keyWords = new HashSet<>();
+		for (String keyWord: keyWords) {
+			this.keyWords.add(keyWord.trim().toLowerCase());
+		}
+		
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public List<String> getFolder() {
+		return folder;
+	}
+	public void setFolder(List<String> folder) {
+		this.folder = folder;
+	}
+	public String getRowNum() {
+		return rowNum;
+	}
+	public void setRowNum(String rowNum) {
+		this.rowNum = rowNum;
 	}
 
 	

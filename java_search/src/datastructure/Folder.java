@@ -3,10 +3,15 @@ package datastructure;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.google.gson.annotations.Expose;
+
 public class Folder {
-	private String name;
-	private SortedSet<File> files =  new TreeSet(new FileComparator());
 	
+	@Expose()
+	private String name;
+	@Expose()
+	private SortedSet<File> files =  new TreeSet(new FileComparator());
+	@Expose()
 	TreeSet<Folder> folders = new TreeSet(new FolderComparator());
 	
 	public Folder(String name) {
@@ -44,4 +49,7 @@ public class Folder {
 	public void setFiles(SortedSet<File> files) {
 		this.files = files;
 	}
+	
+	
+	
 }
