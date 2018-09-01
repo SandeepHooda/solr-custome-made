@@ -46,8 +46,14 @@ public class Search extends HttpServlet {
 			QueryParser queryParser = new QueryParser();
 			String[] keyWords = query.toLowerCase().split(" ");
 			List<File> filteredFiles = queryParser.getFilteredFiles(keyWords, SearchEngine.getAllFiles());
-			root = SearchEngine.getRootFolderpopulated(filteredFiles);
-			searchResult.setMatchedFilesCount(filteredFiles.size());
+			if (filteredFiles.size()>0) {
+				root = SearchEngine.getRootFolderpopulated(filteredFiles);
+				searchResult.setMatchedFilesCount(filteredFiles.size());
+			}else {//User has not enter any relevent text to narow searhc so show him all records
+				root = SearchEngine.getRootFolderpopulated(SearchEngine.getAllFiles());
+				searchResult.setMatchedFilesCount(SearchEngine.getAllFiles().size());
+			}
+			
 		}
 		searchResult.setExecutionTime(System.currentTimeMillis() - start);
 		searchResult.setSearchResult(root);
