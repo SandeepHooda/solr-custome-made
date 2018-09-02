@@ -3,9 +3,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -18,6 +20,7 @@ public class SearchEngine {
 
 	private static List<Set<String>> synonymsList = new ArrayList<>();
 	private static List<File> allFiles = null;
+	private static Map<String, List<File>> keyWordToFile = new HashMap<>();//We will use this a index when we search keywords in file
 	
 	
 	/**
@@ -68,7 +71,7 @@ public class SearchEngine {
 		List<File> allFiles = new ArrayList<>();
 		try {
 			//1. Read the config file where folder hierarchical and file information is stored
-			String filename = "config.properties";
+			String filename = "config10K.properties";
 			input = SearchEngine.class.getClassLoader().getResourceAsStream(filename);
 			if(input==null){
 		            System.out.println("Sorry, unable to find " + filename);
@@ -106,6 +109,19 @@ public class SearchEngine {
 					}
 				}
 				aFile.setKeyWords(filekeyWordsWithSynonyms);
+				
+				//make an index of this file in keyWordToFile 
+			    for (String keyWord: filekeyWordsWithSynonyms) {
+			    	List<File> filesWithKeyword = keyWordToFile.get(keyWord);
+			    	if (null == filesWithKeyword) {
+			    		filesWithKeyword = new ArrayList<>();
+			    		filesWithKeyword.add(aFile);
+			    		keyWordToFile.put(keyWord, filesWithKeyword);
+			    	}else {
+			    		filesWithKeyword.add(aFile);
+			    	}
+			    	
+			    }
 				
 				allFiles.add(aFile);
 				
@@ -197,5 +213,13 @@ public class SearchEngine {
 
 	public static void setAllFiles(List<File> allFiles) {
 		SearchEngine.allFiles = allFiles;
+	}
+
+	public static Map<String, List<File>> getKeyWordToFile() {
+		return keyWordToFile;
+	}
+
+	public static void setKeyWordToFile(Map<String, List<File>> keyWordToFile) {
+		SearchEngine.keyWordToFile = keyWordToFile;
 	}
 }

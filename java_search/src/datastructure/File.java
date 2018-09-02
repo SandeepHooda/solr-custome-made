@@ -10,6 +10,8 @@ import com.google.gson.annotations.Expose;
 public class File {
 	@Expose(serialize = false, deserialize = false)
 	private String rowNum;
+	@Expose(serialize = false, deserialize = false)
+	private int noOfSerachWordsMatched;
 	@Expose()
 	private String name;
 	@Expose()
@@ -59,6 +61,12 @@ public class File {
 	}
 	public void setRowNum(String rowNum) {
 		this.rowNum = rowNum;
+	}
+	public int getNoOfSerachWordsMatched() {
+		return noOfSerachWordsMatched;
+	}
+	public void setNoOfSerachWordsMatched(int noOfSerachWordsMatched) {
+		this.noOfSerachWordsMatched = noOfSerachWordsMatched;
 	}
 
 	
