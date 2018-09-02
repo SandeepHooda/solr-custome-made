@@ -10,6 +10,8 @@ public class SearchResult {
 	@Expose()
 	private long searchTime;
 	@Expose()
+	private long requestExecutionTime;
+	@Expose()
 	private Folder searchResult;
 	public int getMatchedFilesCount() {
 		return matchedFilesCount;
@@ -29,6 +31,12 @@ public class SearchResult {
 	}
 	public void setSearchTime(long searchTime) {
 		this.searchTime = searchTime;
+	}
+	public long getRequestExecutionTime() {
+		return requestExecutionTime;
+	}
+	public void setRequestExecutionTime(long requestExecutionTime) {
+		this.requestExecutionTime = requestExecutionTime;
 	}
 	
 	

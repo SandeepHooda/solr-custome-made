@@ -63,8 +63,9 @@ public class Search extends HttpServlet {
 		response.setContentType("application/json");
 		GsonBuilder builder = new GsonBuilder();  
 		builder.excludeFieldsWithoutExposeAnnotation();  
-		Gson gson = builder.create();  ;
-		
+		Gson gson = builder.create();  
+	
+		searchResult.setRequestExecutionTime(System.currentTimeMillis() - start);
 		response.getWriter().println(gson.toJson(searchResult));
 	}
 
