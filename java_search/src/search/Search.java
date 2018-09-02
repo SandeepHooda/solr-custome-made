@@ -41,14 +41,14 @@ public class Search extends HttpServlet {
 		SearchResult searchResult = new SearchResult();
 		if (query == null) {
 			root = SearchEngine.getRootFolderpopulated(SearchEngine.getAllFiles());
-			searchResult.setExecutionTime(System.currentTimeMillis() - start);
+			searchResult.setSearchTime(System.currentTimeMillis() - start);
 			searchResult.setMatchedFilesCount(SearchEngine.getAllFiles().size());
 		}else {
 			QueryParser queryParser = new QueryParser();
 			String[] keyWords = query.toLowerCase().split(" ");
 			//List<File> filteredFiles = queryParser.getFilteredFiles(keyWords, SearchEngine.getAllFiles());
 			List<File> filteredFiles = queryParser.getFilteredFiles(keyWords, SearchEngine.getKeyWordToFile());
-			searchResult.setExecutionTime(System.currentTimeMillis() - start);
+			searchResult.setSearchTime(System.currentTimeMillis() - start);
 			if (filteredFiles.size()>0) {
 				root = SearchEngine.getRootFolderpopulated(filteredFiles);
 				searchResult.setMatchedFilesCount(filteredFiles.size());
