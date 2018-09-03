@@ -6,7 +6,7 @@ public class MatchFinder implements Runnable {
 
 	private File aFile;
 	private String[] searchkeyWords;
-	private SearchResultPosition searchResult;
+	private FileSearchRank searchResult;
 	public MatchFinder(File aFile, String[] searchkeyWords) {
 		this.aFile = aFile;
 		this.searchkeyWords = searchkeyWords;
@@ -14,23 +14,23 @@ public class MatchFinder implements Runnable {
 	@Override
 	public void run() {
 		
-			SearchResultPosition searchResult = new SearchResultPosition();
+			FileSearchRank searchResult = new FileSearchRank();
 			searchResult.setFile(aFile);
 			for (String searchKey:searchkeyWords ) {
 				if (aFile.getKeyWords().contains(searchKey)) {
-					searchResult.setPosition(searchResult.getPosition()+1);
+					searchResult.setSearchRank(searchResult.getSearchRank()+1);
 				}
 			}
-			if (searchResult.getPosition()>0) {
+			if (searchResult.getSearchRank()>0) {
 				this.searchResult = searchResult;
 			}
 		
 		
 	}
-	public SearchResultPosition getSearchResult() {
+	public FileSearchRank getSearchResult() {
 		return searchResult;
 	}
-	public void setSearchResult(SearchResultPosition searchResult) {
+	public void setSearchResult(FileSearchRank searchResult) {
 		this.searchResult = searchResult;
 	}
 

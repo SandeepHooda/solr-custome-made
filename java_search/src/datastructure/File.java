@@ -11,7 +11,7 @@ public class File {
 	@Expose(serialize = false, deserialize = false)
 	private String rowNum;
 	@Expose(serialize = false, deserialize = false)
-	private int noOfSerachWordsMatched;
+	private int searchRank;
 	@Expose()
 	private String name;
 	@Expose()
@@ -62,12 +62,12 @@ public class File {
 	public void setRowNum(String rowNum) {
 		this.rowNum = rowNum;
 	}
-	public int getNoOfSerachWordsMatched() {
-		return noOfSerachWordsMatched;
+	public int getSearchRank() {
+		return searchRank;
 	}
-	public void setNoOfSerachWordsMatched(int noOfSerachWordsMatched) {
-		this.noOfSerachWordsMatched = noOfSerachWordsMatched;
+	public void setSearchRank(int searchRank) {
+		this.searchRank = searchRank;
 	}
-
+	
 	
 }

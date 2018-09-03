@@ -1,0 +1,21 @@
+package search;
+
+import datastructure.File;
+
+public class FileSearchRank {
+
+	private int searchRank;//How many search  key words are matched here 
+	private File file;
+	public int getSearchRank() {
+		return searchRank;
+	}
+	public void setSearchRank(int searchRank) {
+		this.searchRank = searchRank;
+	}
+	public File getFile() {
+		return file;
+	}
+	public void setFile(File file) {
+		this.file = file;
+	}
+}

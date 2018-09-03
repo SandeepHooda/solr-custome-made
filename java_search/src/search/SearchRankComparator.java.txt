@@ -1,0 +1,12 @@
+package search;
+
+import java.util.Comparator;
+
+public class SearchRankComparator implements Comparator<FileSearchRank> {
+
+	@Override
+	public int compare(FileSearchRank o1, FileSearchRank o2) {
+		return   o2.getSearchRank() - o1.getSearchRank();
+	}
+
+}

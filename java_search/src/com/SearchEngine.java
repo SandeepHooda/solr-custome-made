@@ -12,7 +12,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import datastructure.File;
 import datastructure.Folder;
@@ -20,7 +19,7 @@ public class SearchEngine {
 
 	private static List<Set<String>> synonymsList = new ArrayList<>();
 	private static List<File> allFiles = null;
-	private static Map<String, List<File>> keyWordToFile = new HashMap<>();//We will use this a index when we search keywords in file
+	private static Map<String, List<File>> keyWordToFileMap = new HashMap<>();//We will use this a index when we search keywords in file
 	
 	
 	/**
@@ -79,10 +78,7 @@ public class SearchEngine {
 			}
 			prop.load(input);
 			
-			//2. Root contains only folder - Folder in root are at Level 1 in the menu
-			Folder root = new Folder("root");
-		
-
+			
 			//each line item in the property file contains a file attributes like its name , its id , its key word and which folder/ sub folder it exists
 			Set<Object> keys = prop.keySet();
 			for (Object key: keys) {
@@ -112,11 +108,11 @@ public class SearchEngine {
 				
 				//make an index of this file in keyWordToFile 
 			    for (String keyWord: filekeyWordsWithSynonyms) {
-			    	List<File> filesWithKeyword = keyWordToFile.get(keyWord);
+			    	List<File> filesWithKeyword = keyWordToFileMap.get(keyWord);
 			    	if (null == filesWithKeyword) {
 			    		filesWithKeyword = new ArrayList<>();
 			    		filesWithKeyword.add(aFile);
-			    		keyWordToFile.put(keyWord, filesWithKeyword);
+			    		keyWordToFileMap.put(keyWord, filesWithKeyword);
 			    	}else {
 			    		filesWithKeyword.add(aFile);
 			    	}
@@ -183,7 +179,7 @@ public class SearchEngine {
 	public static void init() throws IOException {
 		getSynonyms();
 		allFiles = 	readAllFilesFromConfig();
-		Folder root = getRootFolderpopulated(allFiles);	
+		/*Folder root =*/ getRootFolderpopulated(allFiles);	
 		
 		/*GsonBuilder builder = new GsonBuilder();  
 		builder.excludeFieldsWithoutExposeAnnotation();  
@@ -191,18 +187,11 @@ public class SearchEngine {
 		
 		System.out.println( gson.toJson(root));*/
 	}
-	public static String getMainMenu(Folder root) throws IOException {
-		
-		GsonBuilder builder = new GsonBuilder();  
-		builder.excludeFieldsWithoutExposeAnnotation();  
-		Gson gson = builder.create();  ;
-		
-		return gson.toJson(root);
-	}
-	public static void main(String[] args) throws IOException {
+	
+	/*public static void main(String[] args) throws IOException {
 		init();
 		
-	  }
+	  }*/
 
 	public static List<File> getAllFiles() throws IOException {
 		if (null == allFiles) {
@@ -215,11 +204,9 @@ public class SearchEngine {
 		SearchEngine.allFiles = allFiles;
 	}
 
-	public static Map<String, List<File>> getKeyWordToFile() {
-		return keyWordToFile;
+	public static Map<String, List<File>> getKeyWordToFileMap() {
+		return keyWordToFileMap;
 	}
 
-	public static void setKeyWordToFile(Map<String, List<File>> keyWordToFile) {
-		SearchEngine.keyWordToFile = keyWordToFile;
-	}
+	
 }

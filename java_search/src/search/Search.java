@@ -1,6 +1,8 @@
 package search;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -47,7 +49,7 @@ public class Search extends HttpServlet {
 			QueryParser queryParser = new QueryParser();
 			String[] keyWords = query.toLowerCase().split(" ");
 			//List<File> filteredFiles = queryParser.getFilteredFiles(keyWords, SearchEngine.getAllFiles());
-			List<File> filteredFiles = queryParser.getFilteredFiles(keyWords, SearchEngine.getKeyWordToFile());
+			List<File> filteredFiles = queryParser.getFilteredFiles(new HashSet<>(Arrays.asList(keyWords)), SearchEngine.getKeyWordToFileMap());
 			searchResult.setSearchTime(System.currentTimeMillis() - start);
 			if (filteredFiles.size()>0) {
 				root = SearchEngine.getRootFolderpopulated(filteredFiles);
