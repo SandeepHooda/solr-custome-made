@@ -43,8 +43,15 @@ public class SearchEngine {
 			for (Object key: keys) {
 				String word = (String)key;
 				Set<String> synonyms = new HashSet<String>();
-				synonyms.add(word);
-				synonyms.addAll(new HashSet<>(Arrays.asList( prop.getProperty(word).split(" "))));
+				synonyms.add(word.toLowerCase().trim());
+				String[] similars = prop.getProperty(word).split(" ");
+				for (String similar: similars) {
+					if (!"".equals(similar.trim())) {
+						synonyms.add(similar.toLowerCase().trim());
+					}
+					
+				}
+			
 				synonymsList.add(synonyms);
 			}
 		}
@@ -94,11 +101,14 @@ public class SearchEngine {
 				//Add Synonyms
 				Set<String> filekeyWords = aFile.getKeyWords();
 				Set<String> filekeyWordsWithSynonyms = new HashSet<>();
-				filekeyWordsWithSynonyms.addAll(filekeyWords);
+				for (String keyWord: filekeyWords) {
+					filekeyWordsWithSynonyms.add(keyWord.trim().toLowerCase());
+				}
+				
 				Iterator<String> fileKeyWordItr = filekeyWords.iterator();
 				while(fileKeyWordItr.hasNext()) {
 					String keyWord = fileKeyWordItr.next();
-					for (Set<String> synonyms: synonymsList) {
+					for (Set<String> synonyms: synonymsList) {//synonyms set contains synonyms as well as the word itself in lower case 
 						if (synonyms.contains(keyWord)) {
 							filekeyWordsWithSynonyms.addAll(synonyms);
 						}
